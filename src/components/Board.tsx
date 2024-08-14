@@ -19,10 +19,10 @@ const Board = () => {
     new Array(9).fill('')
   )
   const [currentPlayer, setCurrentPlayer] = useState<Player>('x')
-  const [winner, setWinner] = useState<Player>()
+  const [winner, setWinner] = useState<Player | 'draw'>()
 
   const handleOnClick = (idx: number) => {
-    if (boardValues[idx]) return
+    if (boardValues[idx] || winner) return
 
     setWinner(undefined)
     setBoardValues((prev) => {
@@ -53,6 +53,7 @@ const Board = () => {
   const resetBoard = () => {
     setBoardValues(new Array(9).fill(''))
     setCurrentPlayer('x')
+    setWinner(undefined)
   }
 
   useEffect(() => {
@@ -61,9 +62,8 @@ const Board = () => {
 
     if (currentWinner) {
       setWinner(currentWinner)
-      resetBoard()
     } else if (full) {
-      resetBoard()
+      setWinner('draw')
     }
   }, [boardValues])
 
@@ -77,12 +77,25 @@ const Board = () => {
           <div
             className="w-20 aspect-square border flex justify-center items-center cursor-pointer select-none"
             onClick={() => handleOnClick(idx)}
+            key={idx}
           >
             <span>{boardValues[idx] || ''}</span>
           </div>
         ))}
       </div>
-      {winner && <div>{winner} wins</div>}
+      {winner && (
+        <div className="flex flex-col items-center">
+          <div className="m-2">
+            {winner === 'draw' ? 'Draw' : `${winner} wins`}
+          </div>
+          <button
+            onClick={resetBoard}
+            className="border-2 border-indigo-300 rounded p-2"
+          >
+            Reset Game
+          </button>
+        </div>
+      )}
     </>
   )
 }
