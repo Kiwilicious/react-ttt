@@ -24,7 +24,6 @@ const Board = () => {
   const handleOnClick = (idx: number) => {
     if (boardValues[idx] || winner) return
 
-    setWinner(undefined)
     setBoardValues((prev) => {
       const copy = prev.slice()
       copy[idx] = currentPlayer
@@ -83,6 +82,7 @@ const Board = () => {
           </div>
         ))}
       </div>
+      {!winner && <div className="m-2">{currentPlayer} to place</div>}
       {winner && (
         <div className="flex flex-col items-center">
           <div className="m-2">
