@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { defineSVGDefs, generateCircle, generateCross } from './BoardShapes'
 
 type Player = 'x' | 'o'
 type BoardValues = Array<Player>
@@ -70,23 +71,25 @@ const Board = () => {
   return (
     <>
       <div
-        className="flex flex-wrap aspect-square min-w-1/2
+        className="flex flex-wrap aspect-square min-w-[40%]
     w-60"
       >
+        {defineSVGDefs()}
         {boardValues.map((boardValue, idx) => (
           <div
-            className="w-20 aspect-square border flex justify-center items-center cursor-pointer select-none"
+            className="aspect-square border flex basis-1/3 justify-center items-center cursor-pointer select-none"
             onClick={() => handleOnClick(idx)}
             key={idx}
           >
-            <span>{boardValue || ''}</span>
+            {boardValue === 'x' && generateCross()}
+            {boardValue === 'o' && generateCircle()}
           </div>
         ))}
       </div>
-      {!winner && <div className="m-2">{currentPlayer} to place</div>}
+      {!winner && <div className="my-4 text-lg">{currentPlayer} to place</div>}
       {winner && (
-        <div className="flex flex-col items-center">
-          <div className="m-2">
+        <div className="flex flex-col items-center text-lg">
+          <div className="my-4">
             {winner === 'draw' ? 'Draw' : `${winner} wins`}
           </div>
           <button
