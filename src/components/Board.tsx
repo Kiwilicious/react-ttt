@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 type Player = 'x' | 'o'
 type BoardValues = Array<Player>
+type Winner = Player | 'draw'
 
 const winLines = [
   [0, 1, 2],
@@ -14,12 +15,12 @@ const winLines = [
   [2, 4, 6],
 ]
 
+const createNewBoard = () => new Array(9).fill('')
+
 const Board = () => {
-  const [boardValues, setBoardValues] = useState<BoardValues>(
-    new Array(9).fill('')
-  )
+  const [boardValues, setBoardValues] = useState<BoardValues>(createNewBoard())
   const [currentPlayer, setCurrentPlayer] = useState<Player>('x')
-  const [winner, setWinner] = useState<Player | 'draw'>()
+  const [winner, setWinner] = useState<Winner>()
 
   const handleOnClick = (idx: number) => {
     if (boardValues[idx] || winner) return
@@ -50,7 +51,7 @@ const Board = () => {
   }
 
   const resetBoard = () => {
-    setBoardValues(new Array(9).fill(''))
+    setBoardValues(createNewBoard())
     setCurrentPlayer('x')
     setWinner(undefined)
   }
@@ -72,13 +73,13 @@ const Board = () => {
         className="flex flex-wrap aspect-square min-w-1/2
     w-60"
       >
-        {boardValues.map((_, idx) => (
+        {boardValues.map((boardValue, idx) => (
           <div
             className="w-20 aspect-square border flex justify-center items-center cursor-pointer select-none"
             onClick={() => handleOnClick(idx)}
             key={idx}
           >
-            <span>{boardValues[idx] || ''}</span>
+            <span>{boardValue || ''}</span>
           </div>
         ))}
       </div>
@@ -90,7 +91,7 @@ const Board = () => {
           </div>
           <button
             onClick={resetBoard}
-            className="border-2 border-indigo-300 rounded p-2"
+            className="border-2 border-indigo-300 rounded-lg px-4 py-2"
           >
             Reset Game
           </button>
