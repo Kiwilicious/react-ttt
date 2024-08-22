@@ -94,7 +94,7 @@ const Board = () => {
           </div>
           <button
             onClick={resetBoard}
-            className="border-2 border-indigo-300 rounded-lg px-4 py-2"
+            className="border-2 border-indigo-300 rounded-lg px-4 py-2 shadow-md active:translate-y-1"
           >
             Reset Game
           </button>
