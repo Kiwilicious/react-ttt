@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { ChangeEventHandler, useEffect, useState } from 'react'
 import { defineSVGDefs, generateCircle, generateCross } from './BoardShapes'
 
 type Player = 'x' | 'o'
@@ -22,6 +22,8 @@ const Board = () => {
   const [boardValues, setBoardValues] = useState<BoardValues>(createNewBoard())
   const [currentPlayer, setCurrentPlayer] = useState<Player>('x')
   const [winner, setWinner] = useState<Winner>()
+  const [boardHistory, setBoardHistory] = useState<BoardValues[]>([])
+  const [viewingHistory, setViewingHistory] = useState(false)
 
   const handleOnClick = (idx: number) => {
     if (boardValues[idx] || winner) return
@@ -51,13 +53,31 @@ const Board = () => {
     return null
   }
 
+  const handleHistoryScrubber: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setViewingHistory(true)
+
+    const position = +e.target.value
+    const stepValue = 1 / boardHistory.length
+
+    const historyIdx = Math.min(
+      Math.floor(position / stepValue),
+      boardHistory.length - 1
+    )
+
+    setBoardValues(boardHistory[historyIdx])
+  }
+
   const resetBoard = () => {
     setBoardValues(createNewBoard())
     setCurrentPlayer('x')
     setWinner(undefined)
+    setBoardHistory([])
+    setViewingHistory(false)
   }
 
   useEffect(() => {
+    if (viewingHistory) return
+
     const currentWinner = calculateWinner()
     const full = boardValues.every((square) => !!square)
 
@@ -66,18 +86,20 @@ const Board = () => {
     } else if (full) {
       setWinner('draw')
     }
-  }, [boardValues])
+
+    setBoardHistory([...boardHistory, boardValues])
+  }, [boardValues, viewingHistory])
 
   return (
     <>
+      {defineSVGDefs()}
       <div
         className="flex flex-wrap aspect-square min-w-[40%]
-    w-60"
+    w-60 gap-2"
       >
-        {defineSVGDefs()}
         {boardValues.map((boardValue, idx) => (
           <div
-            className="aspect-square border flex basis-1/3 justify-center items-center cursor-pointer select-none"
+            className="aspect-square border flex basis-[30%] justify-center items-center cursor-pointer select-none grow hover:shadow-md"
             onClick={() => handleOnClick(idx)}
             key={idx}
           >
@@ -92,12 +114,24 @@ const Board = () => {
           <div className="my-4">
             {winner === 'draw' ? 'Draw' : `${winner} wins`}
           </div>
-          <button
-            onClick={resetBoard}
-            className="border-2 border-indigo-300 rounded-lg px-4 py-2 shadow-md active:translate-y-1"
-          >
-            Reset Game
-          </button>
+          <div className="flex">
+            <label className="flex flex-col items-center mr-4">
+              Game History
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="any"
+                onChange={handleHistoryScrubber}
+              />
+            </label>
+            <button
+              onClick={resetBoard}
+              className="lato_bold border-2 border-indigo-300 rounded-lg px-4 py-2 shadow-md hover:scale-105 active:translate-y-1"
+            >
+              Reset Board
+            </button>
+          </div>
         </div>
       )}
     </>
